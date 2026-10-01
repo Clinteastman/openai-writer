@@ -81,9 +81,38 @@ def check_setup() -> int:
     return 0
 
 
+def setup_all() -> int:
+    """Fix what can be fixed: install or update Codex, then start the sign-in.
+
+    The only step that needs a person is the browser sign-in with their own ChatGPT account.
+    """
+    code = check_setup()
+    if code == 2:  # not installed
+        npm = shutil.which("npm")
+        if not npm:
+            print("FAIL: npm not found. Install Node.js from https://nodejs.org, then run --setup again.")
+            return 5
+        print("Installing the Codex CLI ...")
+        if subprocess.run([npm, "install", "-g", "@openai/codex"]).returncode:
+            print("FAIL: npm install failed. Re-run in a terminal that may install global packages.")
+            return 6
+        code = check_setup()
+    elif code == 3:  # too old
+        print("Updating the Codex CLI ...")
+        subprocess.run([shutil.which("codex"), "update"])
+        code = check_setup()
+    if code == 4:  # not logged in
+        print("\nSIGN-IN NEEDED: a browser window opens now. Sign in with YOUR OWN ChatGPT account, then come back.")
+        subprocess.run([shutil.which("codex"), "login"])
+        code = check_setup()
+    return code
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--check", action="store_true", help="Check Codex is installed, current and logged in, then exit")
+    ap.add_argument("--setup", action="store_true",
+                    help="Install or update Codex and start the browser sign-in, then check (only the sign-in needs a person)")
     ap.add_argument("--prompt-file", help="File holding the writing brief")
     ap.add_argument("--out", help="File to write OpenAI's reply to")
     ap.add_argument("--model", default="gpt-6.1-sol",
@@ -99,6 +128,8 @@ def main() -> int:
     ap.add_argument("--timeout", type=int, default=600, help="Seconds before giving up (default 600)")
     args = ap.parse_args()
 
+    if args.setup:
+        return setup_all()
     if args.check:
         return check_setup()
     if not args.prompt_file or not args.out:

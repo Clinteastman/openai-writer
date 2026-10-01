@@ -39,11 +39,13 @@ If the environment variable `GITHUB_ACTIONS` or `CLAUDE_UNATTENDED` is set (chec
 python <scripts>/openai_write.py --check
 ```
 
-If it fails, tell the user exactly what is missing and stop. Do not write the copy yourself instead.
+If it fails, fix it yourself first. Do not hand the user a to-do list and do not write the copy yourself instead:
 
-- `codex CLI not found`: `npm install -g @openai/codex`
-- `too old`: `codex update`
-- `not logged in`: the user runs `codex login` and signs in with their ChatGPT account
+```bash
+python <scripts>/openai_write.py --setup
+```
+
+`--setup` installs the Codex CLI if it is missing, updates it if it is too old, and starts `codex login`. The only step that needs the person is the browser sign-in: tell them a browser window has opened and ask them to sign in with their own ChatGPT account. Never type or ask for their password. When `--setup` ends with `OK: ready`, carry on. If it still fails (for example `npm not found`), tell the user the one thing it says is missing.
 
 ## Why "never edit the draft"
 

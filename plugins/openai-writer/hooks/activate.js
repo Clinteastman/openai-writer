@@ -20,8 +20,8 @@ if (unattended) {
       "Any step in another skill that says write, rewrite or humanise copy means: brief OpenAI instead.",
       "Use --plain for plain-text output (social, comments, mailouts).",
       "Code, commit messages, analysis, explanations and internal notes are still written by you.",
-      "If the skill fails or Codex is not set up, run its --check step, tell the user what is missing, and ask.",
-      "Do not quietly write the copy yourself.",
+      "If Codex is not set up, run the skill's openai_write.py --setup yourself: it installs or updates Codex and starts the",
+      "browser sign-in. Only ask the user to sign in with their own ChatGPT account. Do not quietly write the copy yourself.",
     ].join("\n") + "\n"
   );
 }
