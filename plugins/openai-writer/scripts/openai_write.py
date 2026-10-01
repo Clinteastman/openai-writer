@@ -28,7 +28,9 @@ PREAMBLE = (
     "Reply with the finished content only: no preamble, no commentary, no code fences.\n\n"
 )
 
-DEFAULT_RULES = Path(__file__).resolve().parent.parent / "skills" / "openai-writer" / "writing-rules.txt"
+SKILL_DIR = Path(__file__).resolve().parent.parent / "skills" / "openai-writer"
+DEFAULT_RULES = SKILL_DIR / "writing-rules.txt"
+PLAIN_RULES = SKILL_DIR / "writing-rules-plain.txt"
 MIN_CODEX = (0, 159, 0)  # gpt-6.1-sol is rejected on a ChatGPT login before this
 
 
@@ -63,6 +65,8 @@ def main() -> int:
     ap.add_argument("--effort", choices=["low", "medium", "high"], help="Reasoning effort override")
     ap.add_argument("--rules-file", default=str(DEFAULT_RULES),
                     help="Fixed writing rules sent with every brief (default: the plugin's writing-rules.txt)")
+    ap.add_argument("--plain", action="store_true",
+                    help="Plain-text output (social posts, comments, mailouts): uses writing-rules-plain.txt, no HTML or &pound; entity")
     ap.add_argument("--no-rules", action="store_true", help="Send the brief without the fixed rules")
     ap.add_argument("--timeout", type=int, default=600, help="Seconds before giving up (default 600)")
     args = ap.parse_args()
@@ -78,7 +82,8 @@ def main() -> int:
         return 2
 
     brief = Path(args.prompt_file).read_text(encoding="utf-8")
-    rules = "" if args.no_rules else Path(args.rules_file).read_text(encoding="utf-8") + "\n\n"
+    rules_path = PLAIN_RULES if args.plain else Path(args.rules_file)
+    rules = "" if args.no_rules else rules_path.read_text(encoding="utf-8") + "\n\n"
     prompt = PREAMBLE + rules + "BRIEF:\n" + brief
     out = Path(args.out).resolve()
     out.parent.mkdir(parents=True, exist_ok=True)

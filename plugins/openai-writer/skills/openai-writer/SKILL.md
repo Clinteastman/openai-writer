@@ -29,6 +29,10 @@ This skill's base directory is shown when it loads. The scripts are two levels u
 
 Run them with `python` on Windows and `python3` on macOS/Linux.
 
+## Unattended runs are exempt
+
+If the environment variable `GITHUB_ACTIONS` or `CLAUDE_UNATTENDED` is set (check with Bash: `echo $GITHUB_ACTIONS $CLAUDE_UNATTENDED`), no user is present and there is no Codex login. Skip this skill and follow the calling skill's steps as written. Unattended callers such as Hermes must export `CLAUDE_UNATTENDED=1`.
+
 ## Step 0: preflight (first use each session)
 
 ```bash
@@ -72,6 +76,8 @@ Do **not** retype the writing rules. `openai_write.py` sends [writing-rules.txt]
 python <scripts>/openai_write.py --prompt-file _tmp/brief-<slug>.txt --out _tmp/draft-<slug>.html
 ```
 
+- **Plain-text output** (social posts, comments, mailouts, Telegram text): add `--plain`. It sends `writing-rules-plain.txt`, which has no HTML and no `&pound;` entity. Without it, a pound sign would come back as the literal text `&pound;`.
+- **Batches** (many products): put several products in one brief with clear labelled sections, then split the reply into files. One call per product is slow and can hit ChatGPT rate limits.
 - Default model `gpt-6.1-sol`. Override with `--model` and `--effort low|medium|high`.
 - Runs in an empty scratch folder with a read-only sandbox. OpenAI cannot see the project.
 - Prints only `OK: N words written to <path>`.

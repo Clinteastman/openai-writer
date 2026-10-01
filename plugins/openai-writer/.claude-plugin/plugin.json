@@ -1,6 +1,6 @@
 {
   "name": "openai-writer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Claude Code manages, OpenAI writes. Sends a Claude-written brief plus fixed writing rules to OpenAI via the Codex CLI and returns the draft as a file. Includes a read-only humanizer-pattern scorer.",
   "author": {
     "name": "Chris Mossom",
