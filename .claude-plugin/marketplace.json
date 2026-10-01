@@ -1,0 +1,17 @@
+{
+  "name": "openai-writer",
+  "metadata": {
+    "description": "A single-plugin marketplace hosting openai-writer: Claude manages, OpenAI writes."
+  },
+  "owner": {
+    "name": "Chris Mossom",
+    "url": "https://github.com/Clinteastman"
+  },
+  "plugins": [
+    {
+      "name": "openai-writer",
+      "source": "./plugins/openai-writer",
+      "description": "Claude Code writes the brief and manages. OpenAI (via the Codex CLI) writes customer-facing copy. Includes a humanizer-pattern scorer. Never edits the draft."
+    }
+  ]
+}
