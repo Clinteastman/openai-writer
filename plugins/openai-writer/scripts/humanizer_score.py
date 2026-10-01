@@ -302,7 +302,7 @@ def run_judge(raw: str, model: str | None) -> dict:
         out = Path(td) / "judge_out.txt"
         brief.write_text(JUDGE_BRIEF + raw, encoding="utf-8")
         cmd = [sys.executable, str(Path(__file__).resolve().parent / "openai_write.py"),
-               "--prompt-file", str(brief), "--out", str(out), "--no-rules"]
+               "--prompt-file", str(brief), "--out", str(out), "--no-rules", "--no-record"]
         if model:
             cmd += ["--model", model]
         proc = subprocess.run(cmd, capture_output=True, text=True, encoding="utf-8")

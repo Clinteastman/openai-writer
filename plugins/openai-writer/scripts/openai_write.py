@@ -14,12 +14,38 @@ Usage:
 """
 
 import argparse
+import hashlib
+import json
+import os
 import re
 import shutil
 import subprocess
 import sys
 import tempfile
+import time
 from pathlib import Path
+
+# Provenance ledger. Every draft OpenAI returns is copied here so a publish guard
+# can prove that text came from OpenAI. The hook in the gscontent repo reads it.
+LEDGER_HOME = Path(os.environ.get("OPENAI_WRITER_HOME") or Path.home() / ".claude" / "openai-writer")
+
+
+def normalise(text: str) -> str:
+    """Whitespace-insensitive form used for provenance checks (must match the guard hook)."""
+    return re.sub(r"\s+", " ", text.replace("\r\n", "\n")).strip()
+
+
+def record_draft(out: Path, model: str) -> str:
+    """Copy the draft into the ledger and return its normalised sha256."""
+    text = out.read_text(encoding="utf-8")
+    digest = hashlib.sha256(normalise(text).encode("utf-8")).hexdigest()
+    drafts = LEDGER_HOME / "drafts"
+    drafts.mkdir(parents=True, exist_ok=True)
+    (drafts / f"{digest}.txt").write_text(text, encoding="utf-8", newline="\n")
+    with (LEDGER_HOME / "ledger.jsonl").open("a", encoding="utf-8") as f:
+        f.write(json.dumps({"sha256": digest, "ts": int(time.time()), "path": str(out),
+                            "model": model, "words": len(text.split())}) + "\n")
+    return digest
 
 PREAMBLE = (
     "You are a professional copywriter. Write the content described in the brief below.\n"
@@ -68,6 +94,8 @@ def main() -> int:
     ap.add_argument("--plain", action="store_true",
                     help="Plain-text output (social posts, comments, mailouts): uses writing-rules-plain.txt, no HTML or &pound; entity")
     ap.add_argument("--no-rules", action="store_true", help="Send the brief without the fixed rules")
+    ap.add_argument("--no-record", action="store_true",
+                    help="Do not add the reply to the provenance ledger (for scoring and judge calls, not copy)")
     ap.add_argument("--timeout", type=int, default=600, help="Seconds before giving up (default 600)")
     args = ap.parse_args()
 
@@ -124,6 +152,11 @@ def main() -> int:
         return 4
 
     words = len(out.read_text(encoding="utf-8").split())
+    try:
+        if not args.no_record:
+            record_draft(out, args.model)
+    except OSError as e:  # the draft is still usable; only the publish guard will not see it
+        print(f"WARN: could not record draft in ledger: {e}", file=sys.stderr)
     print(f"OK: {words} words written to {out}")
     return 0
 
