@@ -70,7 +70,7 @@ Use the Write tool to save a brief file (in the project's scratch folder, e.g. `
 2. The facts, as a plain list, with "use only these".
 3. Anything to preserve, and anything OpenAI must not touch.
 
-Do **not** retype the writing rules. `openai_write.py` sends [writing-rules.txt](writing-rules.txt) with every brief: British English, banned words, 20-word sentences, installer tone, `&pound;<price>` shortcode, and the humanizer's mechanical patterns (no -ing fluff, no "not only", no vague sources, no em dashes, no curly quotes, no title-case headings). Edit that one file to change the rules for everyone. The humanizer's "add soul" advice is left out on purpose because it does not suit product or collection copy.
+Do **not** retype the writing rules. `openai_write.py` sends [writing-rules.txt](writing-rules.txt) with every brief: British English, banned words, 20-word sentences, expert-retailer tone, `&pound;<price>` shortcode, and the humanizer's mechanical patterns (no -ing fluff, no "not only", no vague sources, no em dashes, no curly quotes, no title-case headings). Edit that one file to change the rules for everyone. The humanizer's "add soul" advice is left out on purpose because it does not suit product or collection copy.
 
 ### 3. Send it
 
